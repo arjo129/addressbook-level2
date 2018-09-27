@@ -2,6 +2,7 @@ package seedu.addressbook.storage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -77,7 +78,10 @@ public class StorageFile {
         try {
             List<String> encodedAddressBook = AddressBookEncoder.encodeAddressBook(addressBook);
             Files.write(path, encodedAddressBook);
-        } catch (IOException ioe) {
+        } catch (AccessDeniedException ex){
+            throw new StorageOperationException("Permission denied when trying to write to file: " + path);
+        }
+        catch (IOException ioe) {
             throw new StorageOperationException("Error writing to file: " + path);
         }
     }
@@ -99,7 +103,8 @@ public class StorageFile {
         } catch (FileNotFoundException fnfe) {
             throw new AssertionError("A non-existent file scenario is already handled earlier.");
         // other errors
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
             throw new StorageOperationException("Error writing to file: " + path);
         } catch (IllegalValueException ive) {
             throw new StorageOperationException("File contains illegal data values; data type constraints not met");
